@@ -1,16 +1,15 @@
-/**
- * A class to model a simple email client. The client is run by a
- * particular user, and sends and retrieves mail via a particular server.
- * 
- * @author David J. Barnes and Michael KÃ¶lling
- * @version 2011.07.31
- */
 public class MailClient
 {
     // The server used for sending and receiving.
     private MailServer server;
     // The user running this client.
     private String user;
+    //Si es true, esta activida la respuesta automatica
+    private boolean respuestaAuto;
+    
+    private String asuntoRespuestaAuto;
+
+    private String mensajeRespuestaAuto;
 
     /**
      * Create a mail client run by user and attached to the given server.
@@ -19,6 +18,9 @@ public class MailClient
     {
         this.server = server;
         this.user = user;
+        respuestaAuto = false;
+        asuntoRespuestaAuto = "";
+        mensajeRespuestaAuto = "";
     }
 
     /**
@@ -26,7 +28,22 @@ public class MailClient
      */
     public MailItem getNextMailItem()
     {
-        return server.getNextMailItem(user);
+        // Recibimos algo del servidor
+        MailItem item = server.getNextMailItem(user);
+        // Si lo que recibimos es un email y la respuesta automatica esta activada...
+        if(respuestaAuto && item != null){
+          // Enviamos un correo de respuesta automaticamente
+          // Creamos el email
+          //MailItem email = new MailItem(user, item.getFrom(), 
+           //                             asuntoRespuestaAuto, mensajeRespuestaAuto);
+          // Enviamos el email        
+          //server.post(email);
+          sendMailItem(item.getFrom(), asuntoRespuestaAuto, mensajeRespuestaAuto);
+        }
+
+        
+        // Devolvemos lo recibido por el servidor
+        return item;
     }
 
     /**
@@ -36,7 +53,13 @@ public class MailClient
     public void printNextMailItem()
     {
         MailItem item = server.getNextMailItem(user);
-        if(item == null) {
+		if(respuestaAuto && item != null){
+			//con senMailItem creamos un email y lo enviamos, quedando alojado en el servidor
+			sendMailItem(item.getFrom(), asuntoRespuestaAuto, mensajeRespuestaAuto);
+			System.out.println(asuntoRespuestaAuto);
+			System.out.println(mensajeRespuestaAuto);
+		  }
+        else if(item == null) {
             System.out.println("No new mail.");
         }
         else {
@@ -52,7 +75,66 @@ public class MailClient
      */
     public void sendMailItem(String to, String subject, String message)
     {
-        MailItem item = new MailItem(user, to, subject, message);
+        MailItem item = new MailItem(user, to, message, subject);
         server.post(item);
     }
+    
+    /**
+     * Imprime por pantalla el numero de emails que hay
+     * en el servidor para nosotros sin descargarlos
+     */
+    public void getNumMensajesNoLeidos()
+    {
+         System.out.println("El usuario "+ user + " tiene " + 
+                            server.howManyMailItems(user) + " mensajes."); 
+    }
+    
+    
+    
+    /**
+     * Permite configurar el texto del asunto y del mensaje de la respuesta
+     * automica.
+     */
+    public void configurarRespuestaAutomatica(String asuntoRespuestaAuto,String mensajeRespuestaAuto)
+    {
+		//con this se puede sobrecargar los atributos
+    	this.asuntoRespuestaAuto = asuntoRespuestaAuto;
+		this.mensajeRespuestaAuto = mensajeRespuestaAuto;
+	
+    }
+    
+    /**
+     * Habilita o deshabilita la respuesta automática
+     */   
+   // public void habilitaRespuestaAuto(boolean activar)
+   // {
+   //   respuestaAuto = activar;
+    //}
+    
+    public void habilitaRespuesta()
+    {
+       if(respuestaAuto == false){
+          
+           respuestaAuto = true;
+        }
+        else
+        {
+            respuestaAuto = false;
+        }
+      /** tambien valdria con una sola linea de esta forma
+       * respuestaAuto = !respuestaAuto;
+       * siempre se ejecuta las sentencia del if cuando es verdadeero
+       * osea va a entrar siempre que la condicion sera verdadera
+       * ejempolo if(respuestaAuto) o if(respuestaAuto == false)
+       */
+    }
+    
+    
 }
+
+
+
+
+
+
+
