@@ -10,6 +10,8 @@ public class MailClient
     private String asuntoRespuestaAuto;
 
     private String mensajeRespuestaAuto;
+    
+    private MailItem guardarMensaje;
 
     /**
      * Create a mail client run by user and attached to the given server.
@@ -21,6 +23,8 @@ public class MailClient
         respuestaAuto = false;
         asuntoRespuestaAuto = "";
         mensajeRespuestaAuto = "";
+        guardarMensaje = null;
+        
     }
 
     /**
@@ -40,8 +44,9 @@ public class MailClient
           //server.post(email);
           sendMailItem(item.getFrom(), asuntoRespuestaAuto, mensajeRespuestaAuto);
         }
-
-        
+        if (item != null){
+            guardarMensaje = item;
+        }
         // Devolvemos lo recibido por el servidor
         return item;
     }
@@ -52,13 +57,19 @@ public class MailClient
      */
     public void printNextMailItem()
     {
-        MailItem item = server.getNextMailItem(user);
-		if(respuestaAuto && item != null){
-			//con senMailItem creamos un email y lo enviamos, quedando alojado en el servidor
-			sendMailItem(item.getFrom(), asuntoRespuestaAuto, mensajeRespuestaAuto);
-			System.out.println(asuntoRespuestaAuto);
-			System.out.println(mensajeRespuestaAuto);
-		  }
+        /**MailItem item = getNextMailItem();
+         * asi seria mas correcto, estoy invocando el metodo mas arriba
+         * asique no se pone nada delante con el punto, como server. y no se 
+         * añade valores(user) ya que arriba esta creado ya con parametros
+         */
+        MailItem item = getNextMailItem();
+        
+        if(respuestaAuto && item != null){
+            //con senMailItem creamos un email y lo enviamos, quedando alojado en el servidor
+            //sendMailItem(item.getFrom(), asuntoRespuestaAuto, mensajeRespuestaAuto);
+            System.out.println(asuntoRespuestaAuto);
+            System.out.println(mensajeRespuestaAuto);
+          }
         else if(item == null) {
             System.out.println("No new mail.");
         }
@@ -97,10 +108,10 @@ public class MailClient
      */
     public void configurarRespuestaAutomatica(String asuntoRespuestaAuto,String mensajeRespuestaAuto)
     {
-		//con this se puede sobrecargar los atributos
-    	this.asuntoRespuestaAuto = asuntoRespuestaAuto;
-		this.mensajeRespuestaAuto = mensajeRespuestaAuto;
-	
+        //con this se puede sobrecargar los atributos
+        this.asuntoRespuestaAuto = asuntoRespuestaAuto;
+        this.mensajeRespuestaAuto = mensajeRespuestaAuto;
+    
     }
     
     /**
@@ -127,6 +138,11 @@ public class MailClient
        * osea va a entrar siempre que la condicion sera verdadera
        * ejempolo if(respuestaAuto) o if(respuestaAuto == false)
        */
+    }
+    
+    public void mostrarEmailGuardado()
+    {
+       guardarMensaje.print();
     }
     
     
